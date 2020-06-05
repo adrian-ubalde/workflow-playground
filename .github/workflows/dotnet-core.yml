@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.101
+        dotnet-version: 3.1.300
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -25,3 +25,9 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Build Docker Image
       run: docker build -t todoapi .
+    - name: Start application
+      run: |
+        docker run -d -p 8080:80 --name todoapi todoapi
+    - name: Integration test
+      shell: bash
+      run: ./integration-tests.sh
