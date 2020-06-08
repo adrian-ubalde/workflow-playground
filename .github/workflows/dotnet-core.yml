@@ -17,17 +17,38 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.300
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Build Docker Image
-      run: docker build -t todoapi .
-    - name: Start application
-      run: |
-        docker run -d -p 8080:80 --name todoapi todoapi
-    - name: Integration test
-      shell: bash
-      run: ./integration-tests.sh
+    #- name: Install dependencies
+    #  run: dotnet restore
+    #- name: Build
+    #  run: dotnet build --configuration Release --no-restore
+    #- name: Test
+    #  run: dotnet test --no-restore --verbosity normal
+    #- name: Build Docker Image
+      #run: docker build -t docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest .
+     # run: docker build -t adrianubalde/playground .
+    #- name: Start application
+    #  run: |
+    #    #docker run -d -p 8080:80 --name todoapi docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest
+    #    docker run -d -p 8080:80 --name todoapi adrianubalde/playground
+    #- name: Integration test
+    #  shell: bash
+    #  run: ./integration-tests.sh
+#    - name: Docker Login
+#      uses: azure/docker-login@v1
+#      with:
+#        login-server: docker.pkg.github.com
+#        username: $GITHUB_ACTOR
+#        password: ${{ secrets.GITHUB_TOKEN }}
+#    - name: Push image to Github Packages
+#      run: docker push docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest
+    #- name: Logout from docker
+    #  run: docker logout
+    - name: Push image to DockerHub
+      uses: docker/build-push-action@v1
+      with:
+        repository: adrianubalde/playground
+        tag_with_ref: true
+        tag_with_sha: true
+        add_git_labels: true
+        #username: ${{ secrets.DOCKER_USERNAME }}
+        #password: ${{ secrets.DOCKER_PASSWORD }}
