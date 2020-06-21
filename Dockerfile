@@ -16,6 +16,7 @@ WORKDIR /source
 COPY --from=build /source/out .
 ENTRYPOINT ["dotnet", "TodoApi.dll"]
 
+# https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly
 # docker build -t todoapi .
 # docker run -it --rm -p 5000:80 --name todoapi todoapi
 # or

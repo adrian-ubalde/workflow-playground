@@ -8,58 +8,53 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        dotnet-version: 3.1.300
-    #- name: Install dependencies
-    #  run: dotnet restore
-    #- name: Build
-    #  run: dotnet build --configuration Release --no-restore
-    #- name: Test
-    #  run: dotnet test --no-restore --verbosity normal
-    #- name: Build Docker Image
-      #run: docker build -t docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest .
-     # run: docker build -t adrianubalde/playground .
-    #- name: Start application
-    #  run: |
-    #    #docker run -d -p 8080:80 --name todoapi docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest
-    #    docker run -d -p 8080:80 --name todoapi adrianubalde/playground
-    #- name: Integration test
-    #  shell: bash
-    #  run: ./integration-tests.sh
-#    - name: Docker Login
-#      uses: azure/docker-login@v1
-#      with:
-#        login-server: docker.pkg.github.com
-#        username: $GITHUB_ACTOR
-#        password: ${{ secrets.GITHUB_TOKEN }}
-#    - name: Push image to Github Packages
-#      run: docker push docker.pkg.github.com/adrian-ubalde/workflow-playground/todoapi:latest
-    - name: Push image to Github Packages
-      uses: docker/build-push-action@v1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-southeast-2
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Set image tag
+      run: echo "::set-env name=IMAGE_TAG::$(date +"%Y%m%d_%H%M%S" -u)-${{ github.sha }}"
+    # - name: Get image tag
+    #   run: echo "IMAGE_TAG is " $IMAGE_TAG
+    - name: Build and tag image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: adrian-ubalde
+      run: |
+        docker build \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+    - name: Start application
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: adrian-ubalde
+      run: |
+        docker run \
+          -d -p 8080:80 --name todoapi $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Integration test
+      shell: bash
+      run: ./integration-tests.sh
+    - name: Push image to AWS ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: adrian-ubalde
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Logout of Amazon ECR
+      if: always()
+      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+    - name: Deploy to AWS CloudFormation
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-        registry: docker.pkg.github.com
-        repository: adrian-ubalde/workflow-playground/todoapi
-        tag_with_ref: true
-        tag_with_sha: true
-        add_git_labels: true
-        username: $GITHUB_ACTOR
-        password: ${{ secrets.GITHUB_TOKEN }}
-    # Works with username and password
-    #- name: Logout from docker
-    #  run: docker logout
-    #- name: Push image to DockerHub
-    #  uses: docker/build-push-action@v1
-    #  with:
-    #    repository: adrianubalde/playground
-    #    tag_with_ref: true
-    #    tag_with_sha: true
-    #    add_git_labels: true
-    #    username: ${{ secrets.DOCKER_USERNAME }}
-    #    password: ${{ secrets.DOCKER_PASSWORD }}
+        name: AwsCosts2
+        template: cloudformation.yaml
+        parameter-overrides: "ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/adrian-ubalde:${{ env.IMAGE_TAG }}"
+        no-fail-on-empty-changeset: "1" # 1=true
+        timeout-in-minutes: 10
