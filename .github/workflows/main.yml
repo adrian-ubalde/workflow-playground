@@ -3,6 +3,8 @@ name: .NET Core
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -40,6 +42,7 @@ jobs:
       shell: bash
       run: ./integration-tests.sh
     - name: Push image to AWS ECR
+      if: github.event_name == 'push' # i.e. Push to master
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: adrian-ubalde
@@ -49,6 +52,7 @@ jobs:
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
     - name: Deploy to AWS CloudFormation
+      if: github.event_name == 'push' # i.e. Push to master
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: AwsCosts2
