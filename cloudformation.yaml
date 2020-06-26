@@ -373,6 +373,20 @@ Resources:
         Version: "2012-10-17"
     Metadata:
       aws:cdk:path: Bonjour/FargateService/TaskDef/TaskRole/Resource
+  FargateServiceTaskDefExecutionRoleCostExplorerApiFullAccess:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Sid: CostExplorerApiFullAccess
+            Action:
+              - ce:GetCostAndUsage
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: FargateServiceTaskDefExecutionRoleCostExplorerApiFullAccess
+      Roles:
+        - Ref: FargateServiceTaskDefTaskRole8CDCF85E
   FargateServiceTaskDef940E3A80:
     Type: AWS::ECS::TaskDefinition
     Properties:
