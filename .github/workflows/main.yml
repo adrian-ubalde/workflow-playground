@@ -11,6 +11,32 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
+    - name: Create AWS Credentials file
+      run: |
+        mkdir -p .aws
+        echo "
+        [default]
+        aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+        " > .aws/credentials
+    # - name: Test AWS Credentials file creation
+    #   run: |
+    #     cat $GITHUB_WORKSPACE/.aws/credentials
+    - name: Create AWS Config file
+      run: |
+        mkdir -p .aws
+        echo '
+        [default]
+        region = ap-southeast-2
+        
+        ' > .aws/config
+    # - name: Test AWS Config file creation
+    #   run: |
+    #     cat $GITHUB_WORKSPACE/.aws/config
+    # - name: Get pwd
+    #   run: |
+    #     pwd
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -37,7 +63,10 @@ jobs:
         ECR_REPOSITORY: adrian-ubalde
       run: |
         docker run \
-          -d -p 8080:80 --name todoapi $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          -d -p 8080:80 \
+          -v $GITHUB_WORKSPACE/.aws:/tmp/.aws:ro \
+          --name todoapi $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker exec todoapi cat /root/.aws/credentials
     - name: Integration test
       shell: bash
       run: ./integration-tests.sh
@@ -47,7 +76,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: adrian-ubalde
       run: |
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}

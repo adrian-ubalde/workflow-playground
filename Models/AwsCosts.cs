@@ -1,4 +1,7 @@
 public class AwsCosts
 {
-    public decimal CurrentMonthCost { get; set; }
+    public string CurrentMonthToDateBalanceCurrency { get; set; }
+
+    public string CurrentMonthToDateBalanceAmount { get; set; }
+
 }

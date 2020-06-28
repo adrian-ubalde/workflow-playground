@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+using Amazon.CostExplorer;
 
 namespace TodoApi.Controllers
 {
@@ -18,9 +14,44 @@ namespace TodoApi.Controllers
         }
 
         [HttpGet()]
-        public ActionResult<AwsCosts> GetCurrentMonthsCosts()
+        public async Task<ActionResult<AwsCosts>> GetCurrentMonthsCostsAsync()
         {
-            return new AwsCosts { CurrentMonthCost = 1.00M };
+            // var client = new AmazonCostExplorerClient(new Amazon.Runtime.BasicAWSCredentials("test", "test"), Amazon.RegionEndpoint.APSoutheast2);
+            var client = new AmazonCostExplorerClient();
+            var response = await client.GetCostAndUsageAsync(
+                new Amazon.CostExplorer.Model.GetCostAndUsageRequest() {
+                    Granularity = Granularity.MONTHLY,
+                    TimePeriod = new Amazon.CostExplorer.Model.DateInterval()
+                    {
+                        Start = "2020-06-01",
+                        End = "2020-07-01"
+                    },
+                    Filter = new Amazon.CostExplorer.Model.Expression()
+                    {
+                        Dimensions = new Amazon.CostExplorer.Model.DimensionValues
+                        { 
+                            Key = "LINKED_ACCOUNT", 
+                            Values = new List<string> { "470344065667" }
+                            // TODO - Use get-access-key-info api?
+                        }
+                    },
+                    Metrics = new List<string>
+                    {
+                        "BlendedCost",
+                        "UnblendedCost",
+                        "UsageQuantity",
+                        "AmortizedCost",
+                        "NetAmortizedCost",
+                        "NetUnblendedCost",
+                        "NormalizedUsageAmount"
+                    }
+                });
+
+            return new AwsCosts
+            {
+                CurrentMonthToDateBalanceAmount = response.ResultsByTime[0].Total["BlendedCost"].Amount,
+                CurrentMonthToDateBalanceCurrency = response.ResultsByTime[0].Total["BlendedCost"].Unit
+            };
         }
     }
 }
