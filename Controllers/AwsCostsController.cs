@@ -23,8 +23,8 @@ namespace TodoApi.Controllers
                     Granularity = Granularity.MONTHLY,
                     TimePeriod = new Amazon.CostExplorer.Model.DateInterval()
                     {
-                        Start = "2020-06-01",
-                        End = "2020-07-01"
+                        Start = "2020-07-01",
+                        End = "2020-08-01"
                     },
                     Filter = new Amazon.CostExplorer.Model.Expression()
                     {
