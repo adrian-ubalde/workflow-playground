@@ -50,6 +50,14 @@ jobs:
       run: echo "::set-env name=IMAGE_TAG::$(date +"%Y%m%d_%H%M%S" -u)-${{ github.sha }}"
     # - name: Get image tag
     #   run: echo "IMAGE_TAG is " $IMAGE_TAG
+    - name: Build Envoy and tag image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: aws-costs-envoy-sidecar
+      run: |
+        docker build \
+          --file Dockerfile-envoy \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
     - name: Build and tag image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -77,14 +85,6 @@ jobs:
         ECR_REPOSITORY: adrian-ubalde
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-    - name: Build Envoy and tag image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: aws-costs-envoy-sidecar
-      run: |
-        docker build \
-          --file Dockerfile-envoy \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
     - name: Push Envoy image to AWS ECR
       if: github.event_name == 'push' # i.e. Push to master
       env:
