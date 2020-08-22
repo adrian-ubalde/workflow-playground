@@ -1,6 +1,8 @@
 Parameters: 
   ContainerImageUri: 
     Type: String
+  EnvoyContainerImageUri:
+    Type: String
 Resources:
   MyVpcF9F0CA6F:
     Type: AWS::EC2::VPC
@@ -403,8 +405,15 @@ Resources:
               awslogs-region:
                 Ref: AWS::Region
           Name: web
+        - Name: envoy
+          Image:
+            Ref: EnvoyContainerImageUri
           PortMappings:
-            - ContainerPort: 80
+            - HostPort: 80
+              ContainerPort: 80
+              Protocol: tcp
+            - HostPort: 8081 # admin
+              ContainerPort: 8081
               Protocol: tcp
       Cpu: "256"
       ExecutionRoleArn:

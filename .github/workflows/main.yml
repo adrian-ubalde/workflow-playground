@@ -77,6 +77,21 @@ jobs:
         ECR_REPOSITORY: adrian-ubalde
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Build Envoy and tag image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: aws-costs-envoy-sidecar
+      run: |
+        docker build \
+          --file Dockerfile-envoy \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+    - name: Push Envoy image to AWS ECR
+      if: github.event_name == 'push' # i.e. Push to master
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: aws-costs-envoy-sidecar
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
@@ -86,6 +101,8 @@ jobs:
       with:
         name: AwsCosts
         template: cloudformation.yaml
-        parameter-overrides: "ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/adrian-ubalde:${{ env.IMAGE_TAG }}"
+        parameter-overrides: >-
+          ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/adrian-ubalde:${{ env.IMAGE_TAG }},
+          EnvoyContainerImageUri=${{ steps.login-ecr.outputs.registry }}/aws-costs-envoy-sidecar:${{ env.IMAGE_TAG }}
         no-fail-on-empty-changeset: "1" # 1=true
         timeout-in-minutes: 10
