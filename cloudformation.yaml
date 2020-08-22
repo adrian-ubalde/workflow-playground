@@ -405,6 +405,10 @@ Resources:
               awslogs-region:
                 Ref: AWS::Region
           Name: web
+          PortMappings:
+            - HostPort: 8080
+              ContainerPort: 8080
+              Protocol: tcp
         - Name: envoy
           Image:
             Ref: EnvoyContainerImageUri
