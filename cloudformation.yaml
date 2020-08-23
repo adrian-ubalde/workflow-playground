@@ -396,14 +396,14 @@ Resources:
         - Essential: true
           Image:
             Ref: ContainerImageUri
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: FargateServiceTaskDefwebLogGroup71FAF541
-              awslogs-stream-prefix: FargateService
-              awslogs-region:
-                Ref: AWS::Region
+          # LogConfiguration:
+          #   LogDriver: awslogs
+          #   Options:
+          #     awslogs-group:
+          #       Ref: FargateServiceTaskDefwebLogGroup71FAF541
+          #     awslogs-stream-prefix: FargateService
+          #     awslogs-region:
+          #       Ref: AWS::Region
           Name: web
           PortMappings:
             - ContainerPort: 8080
@@ -434,12 +434,12 @@ Resources:
           - Arn
     Metadata:
       aws:cdk:path: Bonjour/FargateService/TaskDef/Resource
-  FargateServiceTaskDefwebLogGroup71FAF541:
-    Type: AWS::Logs::LogGroup
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-    Metadata:
-      aws:cdk:path: Bonjour/FargateService/TaskDef/web/LogGroup/Resource
+  # FargateServiceTaskDefwebLogGroup71FAF541:
+  #   Type: AWS::Logs::LogGroup
+  #   UpdateReplacePolicy: Retain
+  #   DeletionPolicy: Retain
+  #   Metadata:
+  #     aws:cdk:path: Bonjour/FargateService/TaskDef/web/LogGroup/Resource
   FargateServiceTaskDefExecutionRole9194820E:
     Type: AWS::IAM::Role
     Properties:
