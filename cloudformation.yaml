@@ -348,6 +348,9 @@ Resources:
           PortMappings:
             - ContainerPort: 8080
               Protocol: tcp
+          Environment:
+            - Name: ASPNETCORE_URLS
+              Value: "http://*:8080"
         - Name: envoy
           Image:
             Ref: EnvoyContainerImageUri
