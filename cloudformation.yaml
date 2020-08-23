@@ -336,14 +336,14 @@ Resources:
         - Essential: true
           Image:
             Ref: ContainerImageUri
-          # LogConfiguration:
-          #   LogDriver: awslogs
-          #   Options:
-          #     awslogs-group:
-          #       Ref: FargateServiceTaskDefwebLogGroup71FAF541
-          #     awslogs-stream-prefix: FargateService
-          #     awslogs-region:
-          #       Ref: AWS::Region
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: FargateServiceTaskDefwebLogGroup71FAF541
+              awslogs-stream-prefix: FargateService
+              awslogs-region:
+                Ref: AWS::Region
           Name: web
           PortMappings:
             - ContainerPort: 8080
@@ -383,9 +383,9 @@ Resources:
         Fn::GetAtt:
           - FargateServiceTaskDefTaskRole8CDCF85E
           - Arn
-  # FargateServiceTaskDefwebLogGroup71FAF541:
-  #   Type: AWS::Logs::LogGroup
-  #   UpdateReplacePolicy: Retain
+  FargateServiceTaskDefwebLogGroup71FAF541:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
   FargateServiceTaskDefenvoyLogGroup71FAF541:
     Type: AWS::Logs::LogGroup
     UpdateReplacePolicy: Retain
