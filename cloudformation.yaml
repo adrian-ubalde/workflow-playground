@@ -406,15 +406,14 @@ Resources:
                 Ref: AWS::Region
           Name: web
           PortMappings:
-            - HostPort: 80
-              ContainerPort: 80
+            - ContainerPort: 8080
               Protocol: tcp
         - Name: envoy
           Image:
             Ref: EnvoyContainerImageUri
           PortMappings:
-            - HostPort: 8080
-              ContainerPort: 8080
+            - HostPort: 80
+              ContainerPort: 80
               Protocol: tcp
             - HostPort: 8081 # admin
               ContainerPort: 8081
@@ -517,7 +516,7 @@ Resources:
       HealthCheckGracePeriodSeconds: 60
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: web
+        - ContainerName: envoy
           ContainerPort: 80
           TargetGroupArn:
             Ref: FargateServiceLBPublicListenerECSGroupBE57E081
