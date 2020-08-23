@@ -19,6 +19,7 @@ static_resources:
               routes:
               - match:
                   prefix: "/api/awscosts"
+                  case_sensitive: false
                 route:
                   cluster: local_service
           http_filters:

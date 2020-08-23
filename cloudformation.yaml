@@ -298,7 +298,7 @@ Resources:
         Ref: MyVpcF9F0CA6F 
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /api/AwsCosts
+      HealthCheckPath: /api/awscosts
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 5

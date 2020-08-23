@@ -2,3 +2,5 @@ FROM envoyproxy/envoy-dev:latest
 
 COPY service-envoy.yaml /etc/envoy/service-envoy.yaml
 CMD /usr/local/bin/envoy -c /etc/envoy/service-envoy.yaml
+
+# https://medium.com/better-programming/understanding-docker-container-exit-codes-5ee79a1d58f6
