@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.CostExplorer;
+using Amazon.CostExplorer.Model;
 
 namespace TodoApi.Controllers
 {
@@ -9,26 +11,30 @@ namespace TodoApi.Controllers
     [ApiController]
     public class AwsCostsController : ControllerBase
     {
-        public AwsCostsController()
+        private readonly IAmazonCostExplorer _client;
+        public AwsCostsController(IAmazonCostExplorer costExplorer)
         {
+            _client = costExplorer;
         }
 
         [HttpGet()]
         public async Task<ActionResult<AwsCosts>> GetCurrentMonthsCostsAsync()
         {
-            // var client = new AmazonCostExplorerClient(new Amazon.Runtime.BasicAWSCredentials("test", "test"), Amazon.RegionEndpoint.APSoutheast2);
-            var client = new AmazonCostExplorerClient();
-            var response = await client.GetCostAndUsageAsync(
-                new Amazon.CostExplorer.Model.GetCostAndUsageRequest() {
+            // For testing and avoiding AWS cost of calling IAmazonCostExplorer.GetCostAndUsageRequest
+            var thisEntireMonth = ConvertToDateIntervalForEntireMonth(DateTime.UtcNow);
+            return new AwsCosts
+            {
+                CurrentMonthToDateBalanceAmount = thisEntireMonth.Start, //"777.77",
+                CurrentMonthToDateBalanceCurrency = thisEntireMonth.End
+            };
+
+            var response = await _client.GetCostAndUsageAsync(
+                new GetCostAndUsageRequest() {
                     Granularity = Granularity.MONTHLY,
-                    TimePeriod = new Amazon.CostExplorer.Model.DateInterval()
+                    TimePeriod = ConvertToDateIntervalForEntireMonth(DateTime.UtcNow),
+                    Filter = new Expression()
                     {
-                        Start = "2020-07-01",
-                        End = "2020-08-01"
-                    },
-                    Filter = new Amazon.CostExplorer.Model.Expression()
-                    {
-                        Dimensions = new Amazon.CostExplorer.Model.DimensionValues
+                        Dimensions = new DimensionValues
                         { 
                             Key = "LINKED_ACCOUNT", 
                             Values = new List<string> { "470344065667" }
@@ -53,5 +59,16 @@ namespace TodoApi.Controllers
                 CurrentMonthToDateBalanceCurrency = response.ResultsByTime[0].Total["BlendedCost"].Unit
             };
         }
+        
+        private DateInterval ConvertToDateIntervalForEntireMonth(DateTime dateTime)
+        {
+            var firstDayOfMonth = new DateTime(dateTime.Year, dateTime.Month, 1);
+            return new DateInterval()
+            {
+                Start = firstDayOfMonth.ToString("yyyy-MM-01"),
+                End = firstDayOfMonth.AddMonths(1).ToString("yyyy-MM-01")
+            };
+        }
+
     }
 }
