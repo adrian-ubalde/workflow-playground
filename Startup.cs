@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
 using Amazon.CostExplorer;
 
 namespace TodoApi
@@ -21,8 +19,6 @@ namespace TodoApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TodoContext>(opt =>
-               opt.UseInMemoryDatabase("TodoList"));
             services.AddControllers();
 
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
@@ -31,10 +27,10 @@ namespace TodoApi
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // if (env.IsDevelopment())
-            // {
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
-            // }
+            }
 
             app.UseStatusCodePages();
 
