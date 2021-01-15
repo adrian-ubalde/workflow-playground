@@ -14,26 +14,25 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /source
 COPY --from=build /source/out .
-# ENTRYPOINT ["dotnet", "TodoApi.dll"]
 
 COPY docker-entrypoint.sh /bin/docker-entrypoint.sh
 RUN chmod +x /bin/docker-entrypoint.sh
 ENTRYPOINT ["/bin/docker-entrypoint.sh"]
-CMD ["dotnet", "TodoApi.dll"]
+CMD ["dotnet", "AwsCostsApi.dll"]
 
 # https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly
 # https://nickjanetakis.com/blog/a-linux-dev-environment-on-windows-with-wsl-2-docker-desktop-and-more
-# docker build -t todoapi .
-# docker run -it --rm -p 5000:80 --name todoapi todoapi
+# docker build -t aws-costs-api .
+# docker run -it --rm -p 5000:80 --name aws_costs_api aws-costs-api
 # or
-# docker run -d -p 5000:80 --name todoapi todoapi
+# docker run -d -p 5000:80 --name aws_costs_api aws-costs-api
 
 # https://nickjanetakis.com/blog/docker-tip-56-volume-mounting-ssh-keys-into-a-docker-container
 # From WSL
-# docker run -d -p 8080:80 -v /c/Users/adrian.ubalde/.aws:/tmp/.aws:ro --name todoapi todoapi
+# docker run -d -p 8080:80 -v /c/Users/adrian.ubalde/.aws:/tmp/.aws:ro --name aws_costs_api aws-costs-api
 
 # Debug - https://medium.com/@oprearocks/how-to-properly-override-the-entrypoint-using-docker-run-2e081e5feb9d
-# docker run -it --rm -p 8080:80 -v /c/Users/adrian.ubalde/.aws:/tmp/.aws:ro --entrypoint "/bin/bash" todoapi -s
+# docker run -it --rm -p 8080:80 -v /c/Users/adrian.ubalde/.aws:/tmp/.aws:ro --entrypoint "/bin/bash" aws-costs-api -s
 # How do trouble-shoot a problem where AWS Fargate task cannot launch a container from your image?
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/troubleshooting.html
 # docker 

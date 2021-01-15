@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Amazon.CostExplorer;
 
-namespace TodoApi
+namespace AwsCostsApi
 {
     public class Startup
     {

@@ -61,20 +61,20 @@ jobs:
     - name: Build and tag image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: adrian-ubalde
+        ECR_REPOSITORY: aws-costs-api
       run: |
         docker build \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
     - name: Start application
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: adrian-ubalde
+        ECR_REPOSITORY: aws-costs-api
       run: |
         docker run \
           -d -p 8080:80 \
           -v $GITHUB_WORKSPACE/.aws:/tmp/.aws:ro \
-          --name todoapi $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker exec todoapi cat /root/.aws/credentials
+          --name aws_costs_api $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker exec aws_costs_api cat /root/.aws/credentials
     - name: Integration test
       shell: bash
       run: ./integration-tests.sh
@@ -82,7 +82,7 @@ jobs:
       if: github.event_name == 'push' # i.e. Push to main
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: adrian-ubalde
+        ECR_REPOSITORY: aws-costs-api
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Push Envoy image to AWS ECR
@@ -99,10 +99,10 @@ jobs:
       if: github.event_name == 'push' # i.e. Push to main
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-        name: AwsCosts
+        name: AWSCosts
         template: cloudformation.yaml
         parameter-overrides: >-
-          ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/adrian-ubalde:${{ env.IMAGE_TAG }},
+          ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/aws-costs-api:${{ env.IMAGE_TAG }},
           EnvoyContainerImageUri=${{ steps.login-ecr.outputs.registry }}/aws-costs-envoy-sidecar:${{ env.IMAGE_TAG }}
         no-fail-on-empty-changeset: "1" # 1=true
         timeout-in-minutes: 10
