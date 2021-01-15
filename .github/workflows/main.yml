@@ -96,11 +96,11 @@ jobs:
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
   deploy:
+    if: github.event_name == 'push' # i.e. Push to main
     needs: build-and-test
     runs-on: ubuntu-18.04
     steps:
     - name: Deploy to AWS CloudFormation
-      if: github.event_name == 'push' # i.e. Push to main
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: AWSCostsAPI
