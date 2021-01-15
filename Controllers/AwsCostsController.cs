@@ -21,13 +21,14 @@ namespace AwsCostsApi.Controllers
         [HttpGet()]
         public async Task<ActionResult<AwsCosts>> GetCurrentMonthsCostsAsync()
         {
-            // For testing and avoiding AWS cost of calling IAmazonCostExplorer.GetCostAndUsageRequest
             var thisEntireMonth = ConvertToDateIntervalForEntireMonth(DateTime.UtcNow);
-            return new AwsCosts
-            {
-                CurrentMonthToDateBalanceAmount = thisEntireMonth.Start, //"777.77",
-                CurrentMonthToDateBalanceCurrency = thisEntireMonth.End
-            };
+
+            // For testing and avoiding AWS cost of calling IAmazonCostExplorer.GetCostAndUsageRequest
+            // return new AwsCosts
+            // {
+            //     CurrentMonthToDateBalanceAmount = thisEntireMonth.Start, //"777.77",
+            //     CurrentMonthToDateBalanceCurrency = thisEntireMonth.End
+            // };
 
             var response = await _client.GetCostAndUsageAsync(
                 new GetCostAndUsageRequest() {
