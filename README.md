@@ -8,7 +8,7 @@ The goals of this repository are to:
 * Demonstrate the use of <a href="https://www.envoyproxy.io/" target="_blank">Envoy</a> to handle transient failures in a distributed system (such as HTTP/TCP connection <a href="https://www.envoyproxy.io/docs/envoy/latest/faq/configuration/timeouts#faq-configuration-timeouts" target="_blank">timeouts</a> and <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking#arch-overview-circuit-break" target="_blank">circuit-breaking</a>) and improve observability via <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/observability/tracing" target="_blank">distributed tracing</a>.
 
 
-## <a name="cicd-pipeline"></a>Git-based Continuous Integration / Continuous Deploymnent (CICD) Pipeline
+## <a name="cicd-pipeline"></a>Git-based Continuous Integration / Continuous Deployment (CICD) Pipeline
 
 A CICD pipeline for the AWS Costs API has been build using GitHub Actions.
 
