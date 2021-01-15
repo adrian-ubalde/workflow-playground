@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-test-deploy:
+  build-and-test:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -95,11 +95,15 @@ jobs:
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-18.04
+    steps:
     - name: Deploy to AWS CloudFormation
       if: github.event_name == 'push' # i.e. Push to main
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-        name: AWSCosts
+        name: AWSCostsAPI
         template: cloudformation.yaml
         parameter-overrides: >-
           ContainerImageUri=${{ steps.login-ecr.outputs.registry }}/aws-costs-api:${{ env.IMAGE_TAG }},
