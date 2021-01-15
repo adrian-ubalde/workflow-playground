@@ -10,7 +10,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Create AWS Credentials file
       run: |
         mkdir -p .aws
@@ -100,6 +101,8 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-18.04
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
