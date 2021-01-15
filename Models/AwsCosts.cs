@@ -1,7 +1,9 @@
-public class AwsCosts
+namespace AwsCostsApi.Models
 {
-    public string CurrentMonthToDateBalanceCurrency { get; set; }
+    public class AwsCosts
+    {
+        public string CurrentMonthToDateBalanceCurrency { get; set; }
 
-    public string CurrentMonthToDateBalanceAmount { get; set; }
-
+        public string CurrentMonthToDateBalanceAmount { get; set; }
+    }
 }

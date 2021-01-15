@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.CostExplorer;
 using Amazon.CostExplorer.Model;
+using AwsCostsApi.Models;
 
-namespace TodoApi.Controllers
+namespace AwsCostsApi.Controllers
 {
-    [Route("api/AwsCosts")]
+    [Route("api/awscosts")]
     [ApiController]
     public class AwsCostsController : ControllerBase
     {
